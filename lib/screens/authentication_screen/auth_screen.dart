@@ -52,15 +52,6 @@ class _AuthenticationState extends State<Authentication> {
               'https://ui-avatars.com/api/?name=$username&background=ff5733&color=fff&length=1',
         );
 
-        List<String> splitList = username.split(' ');
-        List<String> indexList = [];
-
-        for (int i = 0; i < splitList.length; i++) {
-          for (int j = 0; j < splitList[i].length + i; j++) {
-            indexList.add(splitList[i].substring(0, j).toLowerCase());
-          }
-        }
-
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user.uid)
@@ -68,8 +59,6 @@ class _AuthenticationState extends State<Authentication> {
           "uid": userCredential.user.uid,
           "username": username,
           "email": email,
-          "searchIndex": indexList,
-          "bio": '',
           "photoURL": userCredential.user.photoURL ??
               'https://ui-avatars.com/api/?name=$username&background=ff5733&color=fff&length=1',
           "timestamp": timestamp,

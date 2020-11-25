@@ -43,6 +43,11 @@ class _AuthBodyState extends State<AuthBody> {
         context,
       );
     }
+    
+    _userNameController.clear();
+    _emailController.clear();
+    _passwordController.clear();
+    _retypePasswordController.clear();
   }
 
   @override
