@@ -1,7 +1,7 @@
 import 'package:BlogApp/screens/authentication_screen/auth_screen.dart';
 import 'package:BlogApp/screens/home_screen.dart';
 import 'package:BlogApp/models/user_model.dart';
-import 'package:BlogApp/widgets/progress_indicator.dart';
+import 'package:BlogApp/widgets/progress_indicator_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 

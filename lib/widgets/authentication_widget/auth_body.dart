@@ -1,5 +1,5 @@
 import 'package:BlogApp/screens/authentication_screen/reset_screen.dart';
-import 'package:BlogApp/widgets/progress_indicator.dart';
+import 'package:BlogApp/widgets/progress_indicator_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,12 +42,12 @@ class _AuthBodyState extends State<AuthBody> {
         _isLogin,
         context,
       );
+
+      _userNameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _retypePasswordController.clear();
     }
-    
-    _userNameController.clear();
-    _emailController.clear();
-    _passwordController.clear();
-    _retypePasswordController.clear();
   }
 
   @override

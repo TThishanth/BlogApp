@@ -11,15 +11,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-
 final usersRef = FirebaseFirestore.instance.collection('users');
 final postsRef = FirebaseFirestore.instance.collection('blogs');
 final storageRef = FirebaseStorage.instance.ref();
 final AuthenticationServices authServices = AuthenticationServices();
 final timelineRef = FirebaseFirestore.instance.collection('timeline');
 final timestamp = DateTime.now();
-
-
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -53,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         controller: _pageController,
         children: [
-          TimelinePage(),
+          TimelinePage(uid: user.uid),
           BookmarkPage(),
           UploadPage(uid: user.uid),
           NotificationPage(),

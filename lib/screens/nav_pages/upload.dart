@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:BlogApp/screens/home_screen.dart';
-import 'package:BlogApp/widgets/progress_indicator.dart';
+import 'package:BlogApp/widgets/progress_indicator_widget.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,10 +17,12 @@ class UploadPage extends StatefulWidget {
   _UploadPageState createState() => _UploadPageState();
 }
 
-class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMixin<UploadPage> {
-  var _imageFile;
+class _UploadPageState extends State<UploadPage>
+    with AutomaticKeepAliveClientMixin<UploadPage> {
+  File _imageFile;
   bool _isUploading = false;
-  String _blogId = Uuid().v4();
+  String blogId = Uuid().v4();
+  final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
   TextEditingController _blogTitle = TextEditingController();
   TextEditingController _blogDescription = TextEditingController();
@@ -126,7 +128,7 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
     Im.Image imageFile = Im.decodeImage(_imageFile.readAsBytesSync());
 
     // Save the thumbnail as a JPG.
-    final compressedImageFile = File('$path/img_$_blogId.jpg')
+    final compressedImageFile = File('$path/img_$blogId.jpg')
       ..writeAsBytesSync(Im.encodeJpg(imageFile, quality: 80));
 
     setState(() {
@@ -136,17 +138,16 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
 
   Future<String> _uploadImage(_imageFile) async {
     UploadTask uploadTask =
-        storageRef.child('post_$_blogId.jpg').putFile(_imageFile);
+        storageRef.child('blog_$blogId.jpg').putFile(_imageFile);
     TaskSnapshot storageSnap = await uploadTask;
     String downloadUrl = await storageSnap.ref.getDownloadURL();
     return downloadUrl;
   }
 
-
   createPostInFirestore(
       {String mediaURL, String title, String description, String body}) {
-    postsRef.doc(widget.uid).collection('userPosts').doc(_blogId).set({
-      "blogId": _blogId,
+    postsRef.doc(widget.uid).collection('userPosts').doc(blogId).set({
+      "blogId": blogId,
       "ownerId": widget.uid,
       "title": title,
       "description": description,
@@ -156,8 +157,8 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
       "bookmarks": {},
     });
     // we need to see our posts in timeline
-    timelineRef.doc(widget.uid).collection('timelineBlogs').doc(_blogId).set({
-      "blogId": _blogId,
+    timelineRef.doc(blogId).set({
+      "blogId": blogId,
       "ownerId": widget.uid,
       "title": title,
       "description": description,
@@ -167,35 +168,39 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
       "bookmarks": {},
     });
   }
-    
 
   _handleSubmit() async {
-
+    final _isValid = _formKey.currentState.validate();
     FocusScope.of(context).unfocus();
 
-    setState(() {
-      _isUploading = true;
-    });
+    if (_isValid) {
+      _formKey.currentState.save();
 
-    await _compressImage();
+      setState(() {
+        _isUploading = true;
+      });
 
-    String mediaUrl = await _uploadImage(_imageFile);
+      await _compressImage();
 
-    createPostInFirestore(
-      mediaURL: mediaUrl,
-      title: _blogTitle.text.trim(),
-      description: _blogDescription.text.trim(),
-      body: _blogBody.text.trim(),
-    );
+      String mediaUrl = await _uploadImage(_imageFile);
 
-    _blogTitle.clear();
-    _blogDescription.clear();
-    _blogBody.clear();
+      createPostInFirestore(
+        mediaURL: mediaUrl,
+        title: _blogTitle.text.trim(),
+        description: _blogDescription.text.trim(),
+        body: _blogBody.text.trim(),
+      );
 
-    setState(() {
-      _imageFile = null;
-      _isUploading = false;
-    });
+      _blogTitle.clear();
+      _blogDescription.clear();
+      _blogBody.clear();
+
+      setState(() {
+        _imageFile = null;
+        _isUploading = false;
+        blogId = Uuid().v4();
+      });
+    }
   }
 
   SafeArea buildUploadForm() {
@@ -253,50 +258,75 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
               ),
               Container(
                 padding: EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    TextField(
-                      controller: _blogTitle,
-                      decoration: InputDecoration(
-                        hintText: 'Blog title',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        prefixIcon: Icon(Icons.title),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 10.0,
                       ),
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    TextField(
-                      controller: _blogDescription,
-                      maxLines: 2,
-                      decoration: InputDecoration(
-                        hintText: 'Blog Description',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+                      TextFormField(
+                        controller: _blogTitle,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter the title';
+                          } else if (value.trim().length > 15) {
+                            return 'Blog title must be under 15 characters';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Blog title',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          prefixIcon: Icon(Icons.title),
                         ),
-                        prefixIcon: Icon(Icons.description),
                       ),
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    TextField(
-                      controller: _blogBody,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: 'Blog Body',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      TextFormField(
+                        controller: _blogDescription,
+                        maxLines: 2,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter the blog description';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Blog Description',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          prefixIcon: Icon(Icons.description),
                         ),
-                        prefixIcon: Icon(Icons.animation),
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      TextFormField(
+                        controller: _blogBody,
+                        maxLines: 4,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter the blog body';
+                          } else if (value.trim().length < 150) {
+                            return 'Blog body must be atleast 150 characters';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Blog Body',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          prefixIcon: Icon(Icons.animation),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -311,7 +341,6 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return  _imageFile == null ? buildSplashPage() : buildUploadForm();
-  
+    return _imageFile == null ? buildSplashPage() : buildUploadForm();
   }
 }

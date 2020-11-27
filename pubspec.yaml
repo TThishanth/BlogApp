@@ -60,6 +60,7 @@ flutter:
   assets:
     - animation/person-on-laptop.json
     - animation/profile.json
+    - animation/nodata.json
     - asset/images/sign_in.svg
     - asset/images/sign_up.svg
     - asset/images/forgot_password.svg
