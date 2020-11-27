@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
 class BlogPost {
   final String blogId;
   final String ownerId;
   final String title;
   final String description;
-  final Text blogBody;
+  final String blogBody;
   final String mediaUrl;
   final dynamic bookmarks;
   final DateTime timestamp;

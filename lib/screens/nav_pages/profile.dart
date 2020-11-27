@@ -1,8 +1,7 @@
 import 'package:BlogApp/screens/authentication_screen/auth_screen.dart';
-import 'package:BlogApp/services/authentication_service.dart';
+import 'package:BlogApp/screens/home_screen.dart';
 import 'package:BlogApp/models/user_model.dart';
 import 'package:BlogApp/widgets/progress_indicator.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -14,7 +13,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  AuthenticationServices _authServices = AuthenticationServices();
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return SafeArea(
       child: Scaffold(
         body: FutureBuilder(
-          future: FirebaseFirestore.instance
-              .collection('users')
+          future: usersRef
               .doc(widget.uid)
               .get(),
           builder: (context, snapshot) {
@@ -69,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 5.0,
                       ),
                       Text(
-                        user.email,
+                        user.id,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 30.0,
@@ -101,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         onPressed: () {
-                          _authServices.signout();
+                          authServices.signout();
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

@@ -37,6 +37,9 @@ dependencies:
   convex_bottom_bar: ^2.6.0
   uuid: ^2.2.2
   image_picker: ^0.6.7+14
+  image: ^2.1.19
+  path_provider: ^1.6.24
+  firebase_storage: ^5.1.0
 
 dev_dependencies:
   flutter_test:

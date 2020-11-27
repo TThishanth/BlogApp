@@ -4,9 +4,22 @@ import 'package:BlogApp/screens/nav_pages/notification.dart';
 import 'package:BlogApp/screens/nav_pages/profile.dart';
 import 'package:BlogApp/screens/nav_pages/timeline.dart';
 import 'package:BlogApp/screens/nav_pages/upload.dart';
+import 'package:BlogApp/services/authentication_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+
+
+final usersRef = FirebaseFirestore.instance.collection('users');
+final postsRef = FirebaseFirestore.instance.collection('blogs');
+final storageRef = FirebaseStorage.instance.ref();
+final AuthenticationServices authServices = AuthenticationServices();
+final timelineRef = FirebaseFirestore.instance.collection('timeline');
+final timestamp = DateTime.now();
+
+
 
 class HomeScreen extends StatefulWidget {
   @override
