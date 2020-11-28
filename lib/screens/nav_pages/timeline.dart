@@ -79,7 +79,10 @@ class _TimelinePageState extends State<TimelinePage> {
           backgroundColor: Theme.of(context).primaryColor,
           title: Text(
             'Timeline',
-            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         body: RefreshIndicator(

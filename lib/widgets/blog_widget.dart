@@ -1,9 +1,12 @@
 import 'package:BlogApp/models/user_model.dart' as usr;
 import 'package:BlogApp/screens/home_screen.dart';
+import 'package:BlogApp/widgets/blog_detail_page_widget.dart';
 import 'package:BlogApp/widgets/progress_indicator_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get_time_ago/get_time_ago.dart';
+import 'package:page_transition/page_transition.dart';
 
 class Blog extends StatefulWidget {
   final String blogId;
@@ -111,6 +114,13 @@ class _BlogState extends State<Blog> {
         doc.reference.delete();
       }
     });
+
+    // delete post from notification
+    notificationRef.doc(blogId).get().then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
   }
 
   handleDeleteBlog(BuildContext ctx) {
@@ -157,13 +167,13 @@ class _BlogState extends State<Blog> {
             backgroundImage: NetworkImage(user.photoUrl),
           ),
           title: Text(
-            title,
+            user.username,
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
-          subtitle: Text('by - ' + user.username),
+          subtitle: Text(TimeAgo.getTimeAgo(timestamp.toDate())),
           trailing: isPostOwner
               ? IconButton(
                   icon: Icon(Icons.more_vert),
@@ -177,9 +187,22 @@ class _BlogState extends State<Blog> {
 
   /* ****************************************** */
 
-  Container buildBlogImage() {
-    return Container(
-      child: Image.network(mediaUrl),
+  goBlogDetailPage(blogId) {
+    Navigator.push(
+      context,
+      PageTransition(
+        child: BlogDetailPage(blogId: blogId),
+        type: PageTransitionType.fade,
+      ),
+    );
+  }
+
+  buildBlogImage() {
+    return GestureDetector(
+      onTap: () => goBlogDetailPage(blogId),
+      child: Container(
+        child: Image.network(mediaUrl),
+      ),
     );
   }
 
@@ -221,6 +244,7 @@ class _BlogState extends State<Blog> {
 
   buildPostFooter() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(
@@ -238,52 +262,46 @@ class _BlogState extends State<Blog> {
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(right: 20.0),
-                child: GestureDetector(
-                  onTap: _handleBookmarkBlog,
-                  child: Icon(
-                    isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                    size: 38.0,
-                    color: Colors.blue,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    child: GestureDetector(
+                      onTap: _handleBookmarkBlog,
+                      child: Icon(
+                        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                        size: 38.0,
+                        color: Colors.blue,
+                      ),
+                    ),
                   ),
-                ),
+                  Container(
+                    child: Text(
+                      '$bookmarkCount bookmarks',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20.0,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                child: Text(
-                  'timestamp',
-                  style: TextStyle(
-                    color: Colors.blueGrey,
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  '$bookmarkCount bookmarks',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        Divider(),
         Container(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.only(
+            top: 5.0,
+            bottom: 15.0,
+          ),
           child: Text(
             description,
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 17.0,
+            ),
           ),
         ),
       ],
@@ -293,14 +311,16 @@ class _BlogState extends State<Blog> {
   @override
   Widget build(BuildContext context) {
     isBookmarked = (bookmarks[currentUserId] == true);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        buildBlogHeader(),
-        buildBlogImage(),
-        buildPostFooter(),
-        Divider(),
-      ],
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          buildBlogHeader(),
+          buildBlogImage(),
+          buildPostFooter(),
+        ],
+      ),
     );
   }
 }

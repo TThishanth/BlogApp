@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 5.0,
                       ),
                       Text(
-                        user.id,
+                        user.email,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 30.0,

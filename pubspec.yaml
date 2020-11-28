@@ -40,6 +40,7 @@ dependencies:
   image: ^2.1.19
   path_provider: ^1.6.24
   firebase_storage: ^5.1.0
+  get_time_ago: ^0.0.6
 
 dev_dependencies:
   flutter_test:

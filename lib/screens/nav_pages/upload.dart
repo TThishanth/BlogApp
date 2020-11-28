@@ -167,6 +167,13 @@ class _UploadPageState extends State<UploadPage>
       "timestamp": timestamp,
       "bookmarks": {},
     });
+    // Add in notification
+    notificationRef.doc(blogId).set({
+      "blogId": blogId,
+      "ownerId": widget.uid,
+      "title": title,
+      "timestamp": timestamp,
+    });
   }
 
   _handleSubmit() async {

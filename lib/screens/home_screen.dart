@@ -16,6 +16,7 @@ final postsRef = FirebaseFirestore.instance.collection('blogs');
 final storageRef = FirebaseStorage.instance.ref();
 final AuthenticationServices authServices = AuthenticationServices();
 final timelineRef = FirebaseFirestore.instance.collection('timeline');
+final notificationRef = FirebaseFirestore.instance.collection('notification');
 final timestamp = DateTime.now();
 
 class HomeScreen extends StatefulWidget {
