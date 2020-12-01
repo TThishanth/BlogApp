@@ -1,4 +1,3 @@
-import 'package:BlogApp/screens/authentication_screen/auth_screen.dart';
 import 'package:BlogApp/screens/nav_pages/bookmark.dart';
 import 'package:BlogApp/screens/nav_pages/notification.dart';
 import 'package:BlogApp/screens/nav_pages/profile.dart';
@@ -27,7 +26,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   User user = FirebaseAuth.instance.currentUser;
   PageController _pageController = PageController();
-  var _isAuth = false;
   int currentIndex = 0;
 
   void _onTap(int page) {
@@ -35,10 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
       currentIndex = page;
     });
     _pageController.jumpToPage(page);
-  }
-
-  buildAuthScreen() {
-    return Authentication();
   }
 
   buildUnAuthScreen() {
@@ -110,34 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _isAuth ? buildAuthScreen() : buildUnAuthScreen();
-  }
-}
-
-class BNBCustomPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = new Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    Path path = Path();
-    path.moveTo(0, 20); // Start
-    path.quadraticBezierTo(size.width * 0.20, 0, size.width * 0.35, 0);
-    path.quadraticBezierTo(size.width * 0.40, 0, size.width * 0.40, 20);
-    path.arcToPoint(Offset(size.width * 0.60, 20),
-        radius: Radius.circular(20.0), clockwise: false);
-    path.quadraticBezierTo(size.width * 0.60, 0, size.width * 0.65, 0);
-    path.quadraticBezierTo(size.width * 0.80, 0, size.width, 20);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.lineTo(0, 20);
-    canvas.drawShadow(path, Colors.black, 6, true);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
+    return buildUnAuthScreen();
   }
 }
